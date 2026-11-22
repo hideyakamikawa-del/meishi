@@ -1,0 +1,6 @@
+// オフラインでも開けるように、アプリ本体をキャッシュします(名簿のデータは IndexedDB にあり、ここには入りません)。
+importScripts("version.js");
+const V = "meishi-" + APP_VERSION, FILES = ["./", "index.html", "version.js", "app.js", "core.js", "ocr.js", "sync.js", "ai.js", "store.js", "i18n.js", "manifest.webmanifest", "icon.svg"], LIB = ["lib/tesseract.min.js", "lib/worker.min.js", "lib/tesseract-core-simd-lstm.wasm.js", "lib/tesseract-core-lstm.wasm.js", "lib/tesseract-core-simd.wasm.js", "lib/tesseract-core.wasm.js", "lib/lang/jpn.traineddata.gz", "lib/lang/eng.traineddata.gz"];
+self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES).then(() => Promise.allSettled(LIB.map(u => c.add(u))))).then(() => self.skipWaiting())));
+self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+self.addEventListener("fetch", e => { if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return; e.respondWith(fetch(e.request).then(r => { const cp = r.clone(); caches.open(V).then(c => c.put(e.request, cp)); return r; }).catch(() => caches.match(e.request, { ignoreSearch: true }))); });

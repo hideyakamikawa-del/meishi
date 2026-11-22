@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://accounts.google.com; script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com; worker-src 'self' blob:; connect-src 'self' https://www.googleapis.com https://accounts.google.com https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com http://localhost:* http://127.0.0.1:*; frame-src https://accounts.google.com; object-src 'none'">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><meta name="theme-color" content="#1f4e9c"><title>Meishi</title>
+<style>
+:root{--bg:#fff;--tx:#1c2430;--sub:#667085;--line:#e1e5ec;--card:#fff;--ac:#1f4e9c;--acbg:#e8eefb;--warn:#fff7e0;--bad:#c62828}
+@media(prefers-color-scheme:dark){:root{--bg:#10151c;--tx:#e8edf5;--sub:#9aa6b8;--line:#2a3340;--card:#171e28;--ac:#7aa7ff;--acbg:#1d2a44;--warn:#3a321a;--bad:#ff8a80}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5;padding-top:env(safe-area-inset-top)}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:8px 0}.tabs button{border:0;background:none;padding:8px 12px;border-radius:99px;color:var(--sub);white-space:nowrap;font:inherit}.tabs button.on{background:var(--acbg);color:var(--ac);font-weight:600}
+.nb{display:inline-block;min-width:18px;padding:0 6px;margin-left:4px;border-radius:99px;background:#d29922;color:#fff;font-size:11px;text-align:center}
+button,.btn{font:inherit;padding:8px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);cursor:pointer}button.p,.btn.p{background:var(--ac);color:#fff;border-color:var(--ac)}button.danger{color:var(--bad)}
+input,textarea,select{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--tx)}input.flag,textarea.flag{border-color:#d29922;background:var(--warn)}
+main{padding:14px 0 90px}ul{list-style:none;padding:0;margin:0}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}.card.chg{border-left:5px solid var(--bad)}.card.pend{border-left:5px solid #d29922}
+.sub{color:var(--sub);font-size:13px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.grow{flex:1}.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}.grid label{font-size:12px;color:var(--sub)}.grid .wide{grid-column:1/-1}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.thumb{width:100%;max-height:240px;object-fit:contain;border-radius:8px;background:#888;margin:6px 0}table{border-collapse:collapse;width:100%;font-size:14px}td{padding:5px 6px;border-top:1px solid var(--line)}
+.badge{background:#fff3cd;color:#7a5b00;border-radius:6px;padding:0 6px;font-size:11px}.chip{padding:2px 12px;border-radius:99px;background:var(--acbg);color:var(--ac);border-color:transparent;margin:2px}
+#addlog li{padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}#addlog li.ok{color:#2e7d32}#addlog li.ng{color:var(--bad)}
+.dh{display:flex;align-items:center;gap:8px}.dh .x{margin-left:auto;border:0;background:transparent;font-size:26px;line-height:1;padding:2px 10px;cursor:pointer;color:var(--sub,#667)}dialog{width:min(640px,94vw);border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--tx)}pre{white-space:pre-wrap}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;max-width:90vw;z-index:20}#toast.on{opacity:1}
+.chips{margin:8px 0}.chips .chip{max-width:100%;text-align:left;white-space:normal}.mc{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.mc{grid-template-columns:1fr}}.mc button{text-align:left;padding:14px}.wz li{margin:6px 0}.rvgrid{display:grid;gap:12px}@media(min-width:700px){.rvgrid{grid-template-columns:minmax(240px,1fr) 1.5fr}.rvimg{position:sticky;top:64px;align-self:start}}.rvimg .thumb{max-height:60vh}
+.warnbox{display:block;margin:10px 0;padding:8px 10px;background:var(--warn);border-radius:8px;font-size:13px}.warnbox input{width:auto}input.bad{border-color:var(--bad);background:#fdecea}.msg{color:var(--bad);font-size:13px;margin-top:6px}
+h3,h4{margin:.6em 0 .3em}.set label{display:block;margin:10px 0 2px;font-size:13px;color:var(--sub)}
+</style></head><body>
+<header><div class="wrap"><div class="tabs">
+<button data-tab="add" data-i="tabAdd"></button><button data-tab="search" data-i="tabSearch"></button><button data-tab="review"><span data-i="tabReview"></span><span class="nb" id="nb" hidden></span></button><button data-tab="brief" data-i="tabBrief"></button><button data-tab="hist" data-i="tabHist"></button><button data-tab="set" data-i="tabSet"></button>
+</div></div></header>
+<main class="wrap">
+<section class="panel" id="p-add"><div class="row"><span class="badge" id="modechip"></span><button id="modesw2" data-i="modeSwitch"></button></div><h3 data-i="addTitle"></h3><p class="sub" data-i="addHint"></p>
+<div class="row"><label class="btn p">📷 <span data-i="takePhoto"></span><input id="cam" type="file" accept="image/*" capture="environment" hidden></label><label class="btn">🖼 <span data-i="choosePhoto"></span><input id="pick" type="file" accept="image/*" multiple hidden></label></div>
+<h4 data-i="sigTitle"></h4><textarea id="sig" rows="4" data-ph="sigPh"></textarea><div class="row"><button class="p" id="sigGo" data-i="sigGo"></button><label class="btn"><span data-i="sigFile"></span><input id="sigf" type="file" accept=".eml,.txt" hidden></label></div>
+<p class="sub" data-i="sigHelp"></p>
+<ul id="addlog" style="margin-top:14px"></ul></section>
+<section class="panel" id="p-search" hidden><input id="q" type="search" data-ph="searchPh" autocomplete="off"><p class="sub" id="cnt"></p><ul id="res"></ul></section>
+<section class="panel" id="p-review" hidden><p class="sub" data-i="reviewHelp"></p><div class="row"><span class="sub" id="rvc"></span><span class="grow"></span><button id="okall" data-i="okAll" hidden></button></div><ul id="rv"></ul></section>
+<section class="panel" id="p-brief" hidden><p class="sub" data-i="briefHelp"></p><div class="row"><button id="rbulk" hidden></button></div><div id="bprop0"></div><input id="bq" type="search" data-ph="briefPh" autocomplete="off" style="margin-top:10px"><div id="bres"></div></section>
+<section class="panel" id="p-hist" hidden><p class="sub" data-i="histHelp"></p><div class="row"><button class="chip on" data-hf="all" data-i="all"></button><button class="chip" data-hf="mv" data-i="onlyMoves"></button></div><div id="hres"></div></section>
+<section class="panel set" id="p-set" hidden>
+<h3 data-i="setLang"></h3><select id="lang"></select>
+<h3 data-i="modeTitle"></h3><select id="mode"></select><div class="row"><button id="wiz" data-i="wizOpen"></button></div><p class="sub" data-i="modeNote"></p>
+<details><summary class="sub" style="cursor:pointer" data-i="advAi"></summary><h3 data-i="setAi"></h3><label data-i="setProvider"></label><select id="prov"></select><label data-i="setKey"></label><input id="key" type="password" autocomplete="off"><label data-i="setModel"></label><input id="model"><label data-i="setBase"></label><input id="base" placeholder="http://localhost:11434/v1"><p class="sub" data-i="setKeyNote"></p><button id="test" data-i="setTest"></button><pre id="testres" class="sub"></pre>
+</details><h3 data-i="setData"></h3><div class="row"><button id="exCsv" data-i="exportCsv"></button><button id="exVcf" data-i="exportVcf"></button><button id="exJson" data-i="exportJson"></button><button id="exJsonImg" data-i="exportJsonImg"></button></div>
+<div class="row"><label class="btn"><span data-i="importFile"></span><input id="imp" type="file" accept=".csv,.vcf,.json,text/*" hidden></label><button id="persist" data-i="persistAsk"></button><button id="wipe" class="danger" data-i="wipe"></button></div>
+<p class="sub" data-i="persistNote"></p><p class="sub" id="persistst"></p>
+<h3 data-i="syncTitle"></h3><p class="sub" data-i="syncNote"></p><p id="syncst" class="sub"></p><div class="row"><button id="syncon" class="p"></button><button id="syncnow"></button><button id="syncoff" class="danger"></button></div>
+<h3 data-i="privacyTitle"></h3><p class="sub" id="priv"></p>
+<h3 data-i="verTitle"></h3><p id="ver"></p><ul id="verlog" class="sub"></ul></section>
+<p class="sub" id="foot" style="text-align:center;margin:30px 0"></p></main><dialog id="dlg"></dialog><div id="toast"></div>
+<script src="version.js?v=0.8.3"></script><script src="i18n.js?v=0.8.4"></script><script src="store.js?v=0.8.4"></script><script src="ai.js?v=0.7.10"></script><script src="core.js?v=0.7.9"></script><script src="sync.js?v=0.8.4"></script><script src="ocr.js?v=0.7.7"></script><script src="app.js?v=0.8.4"></script>
+</body></html>
