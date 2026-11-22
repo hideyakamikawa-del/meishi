@@ -8,14 +8,27 @@ const OCR = (() => {
       worker = await Tesseract.createWorker(["jpn", "eng"], 1, { workerPath: "lib/worker.min.js", corePath: "lib/", langPath: "lib/lang", gzip: true }); return worker; })();
     return loading;
   }
-  async function run(blob) { const w = await getWorker(); const r = await w.recognize(blob); return r.data.text || ""; }
+  // 前処理: 長辺を約2000pxにそろえ、白黒にして、明暗を引き伸ばす(暗い・ぼやけた写真で精度が落ちるのを抑える)
+  async function prep(blob) {
+    try {
+      const bmp = await createImageBitmap(blob), k = Math.min(2.5, Math.max(0.5, 2000 / Math.max(bmp.width, bmp.height))), cv = document.createElement("canvas");
+      cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      const g = cv.getContext("2d", { willReadFrequently: true }); g.drawImage(bmp, 0, 0, cv.width, cv.height);
+      const im = g.getImageData(0, 0, cv.width, cv.height), d = im.data, h = new Array(256).fill(0);
+      for (let i = 0; i < d.length; i += 4) { const y = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0; d[i] = y; h[y]++; }
+      const n = d.length / 4; let a = 0, lo = 0, hi = 255; for (; lo < 255 && (a += h[lo]) < n * 0.02; lo++); a = 0; for (; hi > 0 && (a += h[hi]) < n * 0.5 * 0.02 + 0; hi--); hi = Math.max(hi, lo + 40);
+      const sc = 255 / (hi - lo); for (let i = 0; i < d.length; i += 4) { const v = Math.max(0, Math.min(255, (d[i] - lo) * sc)); d[i] = d[i + 1] = d[i + 2] = v; }
+      g.putImageData(im, 0, 0); return cv;
+    } catch (e) { return blob; }
+  }
+  async function run(blob) { const w = await getWorker(); const r = await w.recognize(await prep(blob)); return r.data.text || ""; }
   const N = s => (s || "").normalize("NFKC");
   const TITLE = /(代表取締役|取締役|執行役員|部長|次長|課長|係長|主任|主幹|社長|会長|専務|常務|所長|室長|顧問|教授|准教授|講師|博士|CEO|CTO|CFO|COO|CMO|President|Director|Manager|Professor|Engineer|Chief|Head of)/i;
   const COMP = /(株式会社|有限会社|合同会社|一般社団法人|公益財団法人|大学|研究所|Inc\.?|Ltd\.?|Co\.,?|Corp|Corporation|GmbH|LLC|S\.A\.|PLC)/i;
   const DEPT = /(部|課|室|センター|事業所|本部|グループ|支店|営業所|工場|Division|Department|Dept\.?|Group|Team)/i;
   const ADDR = /(東京都|北海道|(?:京都|大阪)府|[^\s]{2,3}県|[市区町村郡].*\d)/;
   function parse(raw) {
-    const lines = N(raw).split(/\n/).map(l => l.replace(/\s+/g, " ").replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g, "$1").trim()).filter(l => l.length > 1).map(l => { const m = l.match(/^([一-鿿々〆ヶ ]{2,8}?)\s*(?:博士|Ph\.?\s?D).*$/i); return m && !TITLE.test(m[1]) && /^[一-鿿々〆ヶ]{2,5}$/.test(m[1].replace(/\s/g, "")) ? m[1].trim() : l; });
+    const lines = N(raw).split(/\n/).map(l => l.replace(/^[\s。．.,、・'"`|:;_~\-]+/, "").replace(/\s+/g, " ").replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g, "$1").trim()).filter(l => l.length > 1).map(l => { const m = l.match(/^([一-鿿々〆ヶ ]{2,8}?)\s*(?:博士|Ph\.?\s?D).*$/i); return m && !TITLE.test(m[1]) && /^[一-鿿々〆ヶ]{2,5}$/.test(m[1].replace(/\s/g, "")) ? m[1].trim() : l; });
     const f = { company: "", dept: "", title: "", name: "", tel: "", fax: "", mobile: "", email: "", zip: "", address: "", url: "" }, flags = [], used = new Set(), BLD = /(ビル|タワー|センター|棟|館|プラザ|ハイツ|\d+\s*[FＦ階]|Bldg|Building|Tower)/i; let addrIdx = -1; const take = (k, v, i, flag) => { if (!f[k] && v) { f[k] = v; if (i != null) used.add(i); if (flag) flags.push(k); } };
     lines.forEach((l, i) => {
       const em = l.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/); if (em) take("email", em[0], i);
