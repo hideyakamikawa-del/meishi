@@ -28,10 +28,10 @@ const OCR = (() => {
   const DEPT = /(部|課|室|センター|事業所|本部|グループ|支店|営業所|工場|Division|Department|Dept\.?|Group|Team)/i;
   const ADDR = /(東京都|北海道|(?:京都|大阪)府|[^\s]{2,3}県|[市区町村郡].*\d)/;
   function parse(raw) {
-    const lines = N(raw).split(/\n/).map(l => l.replace(/^[\s。．.,、・'"`|:;_~\-]+/, "").replace(/\s+/g, " ").replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g, "$1").trim()).filter(l => l.length > 1).map(l => { const m = l.match(/^([一-鿿々〆ヶ ]{2,8}?)\s*(?:博士|Ph\.?\s?D).*$/i); return m && !TITLE.test(m[1]) && /^[一-鿿々〆ヶ]{2,5}$/.test(m[1].replace(/\s/g, "")) ? m[1].trim() : l; });
+    const lines = N(raw).split(/\n/).map(l => l.replace(/^[\s。．.,、・'"`|:;_~\-]+/, "").replace(/\s+/g, " ").replace(/(^|\s)[TＴ]\s?(?=\d{3}[-ー]\d{4})/g, "$1〒").replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g, "$1").trim()).filter(l => l.length > 1).map(l => { const m = l.match(/^([一-鿿々〆ヶ ]{2,8}?)\s*(?:博士|Ph\.?\s?D).*$/i); return m && !TITLE.test(m[1]) && /^[一-鿿々〆ヶ]{2,5}$/.test(m[1].replace(/\s/g, "")) ? m[1].trim() : l; });
     const f = { company: "", dept: "", title: "", name: "", tel: "", fax: "", mobile: "", email: "", zip: "", address: "", url: "" }, flags = [], used = new Set(), BLD = /(ビル|タワー|センター|棟|館|プラザ|ハイツ|\d+\s*[FＦ階]|Bldg|Building|Tower)/i; let addrIdx = -1; const take = (k, v, i, flag) => { if (!f[k] && v) { f[k] = v; if (i != null) used.add(i); if (flag) flags.push(k); } };
     lines.forEach((l, i) => {
-      const em = l.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/); if (em) take("email", em[0], i);
+      const em = l.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/); if (em) take("email", l.indexOf(em[0]) === 0 ? em[0].replace(/^(?:e-?mail|[a-z]{1,2}nmail|e?mail)(?=[a-z0-9_])/i, "") : em[0], i);
       const u = l.match(/(https?:\/\/[^\s]+|www\.[^\s]+)/i); if (u) take("url", /^www/i.test(u[0]) ? "https://" + u[0] : u[0], i);
       const z = l.match(/(?<![\d-])〒?\s*(\d{3})[-ー]?(\d{4})(?![\d-])/); let rest = l;
       if (em) rest = rest.replace(em[0], " "); if (u) rest = rest.replace(u[0], " ");
@@ -55,6 +55,10 @@ const OCR = (() => {
       if (!f.dept && DEPT.test(l) && l.length < 40) { take("dept", l, i, true); return; } });
     lines.forEach((l, i) => { if (used.has(i) || f.name) return; const c = l.replace(/\s/g, "");
       if (/^[一-鿿々〆ヶ]{2,5}$/.test(c) || /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(l)) take("name", l, i, true); });
+    if (f.dept) { const m = f.dept.match(/^(.*[部課室係班科局署所院センターグループ]|.*(?:Division|Department|Dept\.?|Group|Team))[^部課室係班科局署所院]{2,}$/); if (m && /[ぁ-んァ-ヶ]/.test(f.dept.slice(m[1].length))) f.dept = m[1]; }
+    if (!f.name) { lines.forEach((l, i) => { if (used.has(i) || f.name) return; const c = l.replace(/\s/g, ""), k = (c.match(/[一-鿿々]/g) || []).length;
+      if (c.length >= 2 && c.length <= 7 && k >= 2 && k >= c.length - 2 && !TITLE.test(c) && !COMP.test(c) && !DEPT.test(c) && !ADDR.test(c)) take("name", c.replace(/[^一-鿿々〆ヶぁ-んァ-ヶ]/g, ""), i, true); }); }
+    if (!f.name) { lines.forEach((l, i) => { if (used.has(i) || f.name) return; const m = l.match(/^([一-鿿々]{2,5})(?=\s|$)/); if (m && !TITLE.test(l) && !COMP.test(l) && !DEPT.test(m[1]) && !ADDR.test(l)) take("name", m[1], i, true); }); }
     return { fields: f, flags, lines };
   }
   return { run, parse };

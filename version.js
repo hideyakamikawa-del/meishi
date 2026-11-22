@@ -1,6 +1,7 @@
 // バージョンと更新履歴。機能を変えたら、ここに1件足して、APP_VERSION を上げます(index.html の ?v= と sw.js も同じ数字に)。
-const APP_VERSION = "0.8.6";
+const APP_VERSION = "0.8.7";
 const CHANGELOG = [
+  { v: "0.8.7", date: "2026-11-22", ja: ["AIなしの読み取り: 〒をTと誤認・「E-mail」ラベルがメールに混入・部署末尾のゴミ・氏名の取りこぼしを補正"], en: ["No-AI OCR: fix 〒 read as T, E-mail label glued to address, trailing noise in dept, missed names"] },
   { v: "0.8.6", date: "2026-11-22", ja: ["AIなしの文字認識の前に、写真を白黒・明暗補正・拡大してから読む(暗い/ぼやけた写真対策)", "行頭のゴミ記号を除去"], en: ["No-AI OCR now preprocesses photos (grayscale, contrast stretch, upscale)", "Strip stray leading symbols"] },
   { v: "0.8.5", date: "2026-11-22", ja: ["AIなしの読み取り精度を改善: 大学名などの所属行を会社名と取り違えない(「株式会社」を含む行を優先)", "氏名の横に「博士(工学)」などが付いていても氏名を認識"], en: ["Better no-AI OCR: affiliation lines (e.g. university) no longer mistaken for the company; lines with 株式会社 etc. win", "Names followed by degrees such as 博士 are now recognized"] },
   { v: "0.8.3", date: "2026-11-22", ja: ["Google Drive同期を実接続(クライアントID設定済み)・PCで動作確認", "説明を追加: 署名の取り込み/保存を消されにくくする", "プライバシーの説明にDrive同期を追記"], en: ["Google Drive sync connected for real (client ID set) and verified on PC", "Added help text: signature import / keep-storage button", "Privacy text now mentions Drive sync"] },
