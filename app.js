@@ -12,7 +12,7 @@ const WZ = {
 function modeChip() { $("modechip").textContent = MODE === "ai" ? t("modeAiShort") : t("modeManualShort"); }
 function setMode(m) { MODE = m; localStorage.setItem("mode", m); modeChip(); }
 function onboarding() {
-  const d = $("dlg"); d.innerHTML = `<div class="dh"><b>${t("obTitle")}</b><button type="button" class="x" id="dx" aria-label="${t('close')}">×</button></div><div class="mc" style="margin-top:12px"><button id="obM"><b>${t("obManual")}</b><div class="sub">${t("obManualD")}</div></button><button id="obA"><b>${t("obAi")}</b><div class="sub">${t("obAiD")}</div></button></div>`;
+  const d = $("dlg"); d.innerHTML = `<div class="dh"><b>${t("obTitle")}</b><button type="button" class="x" id="dx" aria-label="${t('close')}">×</button></div><div class="mc" style="margin-top:12px"><button id="obA" class="p"><b>${t("obAi")}</b><div class="sub">${t("obAiD")}</div></button><button id="obM"><b>${t("obManual")}</b><div class="sub">${t("obManualD")}</div></button></div>`;
   $("dx").onclick = () => { setMode("manual"); d.close(); renderSet(); }; $("obM").onclick = () => { setMode("manual"); d.close(); renderSet(); }; $("obA").onclick = () => { setMode("ai"); wizard(); }; d.showModal();
 }
 let WZG = 0;

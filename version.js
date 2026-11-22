@@ -1,6 +1,7 @@
 // バージョンと更新履歴。機能を変えたら、ここに1件足して、APP_VERSION を上げます(index.html の ?v= と sw.js も同じ数字に)。
-const APP_VERSION = "0.8.9";
+const APP_VERSION = "0.9.0";
 const CHANGELOG = [
+  { v: "0.9.0", date: "2026-11-22", ja: ["初回の選択を「AIあり(おすすめ)」中心に変更。AIなしは「無料・手入力が中心(読み取りは参考程度)」と正直に表記"], en: ["Onboarding now recommends AI mode; No-AI is described honestly as a free, manual-entry helper"] },
   { v: "0.8.9", date: "2026-11-22", ja: ["AIなしの読み取り: 住所の先頭に残る誤読した郵便番号(52:8001など)を除去"], en: ["No-AI OCR: strip misread zip garbage before the prefecture"] },
   { v: "0.8.8", date: "2026-11-22", ja: ["AIなしの読み取り: 住所の先頭に残る「〒」の誤読(ヘ/T)と郵便番号を除去、住所内の余分な空白を詰める"], en: ["No-AI OCR: strip misread 〒 (ヘ/T) and zip from the address, tidy spaces"] },
   { v: "0.8.7", date: "2026-11-22", ja: ["AIなしの読み取り: 〒をTと誤認・「E-mail」ラベルがメールに混入・部署末尾のゴミ・氏名の取りこぼしを補正"], en: ["No-AI OCR: fix 〒 read as T, E-mail label glued to address, trailing noise in dept, missed names"] },
