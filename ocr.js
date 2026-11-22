@@ -41,7 +41,7 @@ const OCR = (() => {
           if (/fax|ファ/.test(lab)) take("fax", num, i); else if (/携帯|mobile|cell|^m$/.test(lab) || /^0[789]0\d{8}$/.test(d)) take("mobile", num, i); else take("tel", num, i); } }
     });
     lines.forEach((l, i) => { if (used.has(i)) return;
-      if (!f.address && ADDR.test(l) && /\d/.test(l)) { take("address", l.replace(/^〒\s*[\d-]{5,8}\s*/, "").replace(/^〒?\s*\d{3}-?\d{4}\s*/, ""), i); addrIdx = i; return; } });
+      if (!f.address && ADDR.test(l) && /\d/.test(l)) { take("address", l.replace(/^[^一-鿿ぁ-ヶ]{1,12}(?=[一-鿿])/, "").replace(/^〒\s*[\d-]{5,8}\s*/, "").replace(/^〒?\s*\d{3}-?\d{4}\s*/, ""), i); addrIdx = i; return; } });
     { const STRONG = /(株式会社|有限会社|合同会社|一般社団法人|公益財団法人|Inc\.?|Ltd\.?|Co\.,?|Corp|Corporation|GmbH|LLC|S\.A\.|PLC)/i, ok = (l, i) => !used.has(i) && COMP.test(l) && l.length < 40;
       let ci = lines.findIndex((l, i) => ok(l, i) && STRONG.test(l) && !(TITLE.test(l) && !/^(株式会社|有限会社)|(株式会社|有限会社)$/.test(l)));
       if (ci < 0) ci = lines.findIndex((l, i) => ok(l, i) && STRONG.test(l));
